@@ -1,10 +1,16 @@
 const std = @import("std");
 const testing = std.testing;
 
-export fn add(a: f32, b: f32) f32 {
-    return a + b;
+var count: ?i32 = null;
+pub export fn counter() i32 {
+    if (count == null) {
+        count = 0;
+        return 0;
+    }
+    count.? += 1;
+    return count.?;
 }
 
-test "basic add functionality" {
-    try testing.expect(add(3, 7) == 10);
+pub export fn myadd(a: f32, b: f32) f32 {
+    return a + b;
 }

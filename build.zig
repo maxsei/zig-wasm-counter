@@ -9,6 +9,7 @@ pub fn build(b: *std.Build) void {
     // means any target is allowed, and the default is native. Other options
     // for restricting supported target set are available.
     const target = b.standardTargetOptions(.{ .default_target = .{
+        .abi = .musl,
         .cpu_arch = .wasm32,
         .os_tag = .freestanding,
     } });
@@ -18,7 +19,8 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
-    const lib = b.addStaticLibrary(.{
+    const lib = b.addSharedLibrary(.{
+        // const lib = b.addStaticLibrary(.{
         .name = "zig-wasm-triangle",
         // In this case the main source file is merely a path, however, in more
         // complicated build scripts, this could be a generated file.
@@ -26,6 +28,8 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    lib.rdynamic = true;
+    lib.import_symbols = true;
 
     // This declares intent for the library to be installed into the standard
     // location when the user invokes the "install" step (the default step when
