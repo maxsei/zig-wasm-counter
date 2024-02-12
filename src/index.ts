@@ -19,7 +19,8 @@ const counterComponent = () => {
       const counter = new Counter();
       // container
       containerEl = document.createElement("div");
-      containerEl.classList = ["pointer"];
+      containerEl.classList.add("pointer");
+      containerEl.classList.add("user-select-none");
       // Message
       let messageEl = document.createElement("span");
       messageEl.innerText = "Click Me:";
