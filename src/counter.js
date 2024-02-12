@@ -19,4 +19,4 @@ const Counter = await fetch("/zig-out/lib/zig-wasm-triangle.wasm")
       }
     };
   });
-export { Counter }
+export { Counter };
