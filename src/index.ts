@@ -1,32 +1,10 @@
 import { fromPromise, metaStream, fromInterval } from "@thi.ng/rstream";
 import { $compile, $replace } from "@thi.ng/rdom";
 import { scan, comp, reducer, map } from "@thi.ng/transducers";
-
-const CounterPromise = fetch("/zig-out/lib/zig-wasm-triangle.wasm")
-  .then((response) => response.arrayBuffer())
-  .then((bytes) => WebAssembly.compile(bytes))
-  .then((module) => new WebAssembly.Instance(module))
-  .then(
-    (instance) =>
-      class Counter {
-        constructor() {
-          this._fns = instance.exports;
-          this.self = instance.exports.init();
-        }
-        increment() {
-          this._fns.increment(this.self);
-        }
-        get_count() {
-          return this._fns.get_count(this.self);
-        }
-        deinit() {
-          return this._fns.deinit(this.self);
-        }
-      },
-  );
+import {Counter} from "./counter"
 
 const counterComponent = () => {
-  let counter: Counter;
+	const counter = new Counter();
   let containerEl: HTMLElement;
   return {
     el: containerEl,
@@ -35,9 +13,6 @@ const counterComponent = () => {
       idx: number | Element,
       ...xs: any[]
     ): Promise<Element> => {
-      // counter
-      const Counter = await CounterPromise;
-      counter = new Counter();
       // container
       containerEl = document.createElement("div");
       containerEl.classList = ["pointer"];
