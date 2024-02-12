@@ -29,6 +29,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    if (lib.optimize == .ReleaseSmall or lib.optimize == .ReleaseFast) lib.strip = true;
     lib.rdynamic = true;
     lib.import_symbols = true;
 
