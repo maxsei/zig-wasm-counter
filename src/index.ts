@@ -1,10 +1,11 @@
 import { fromPromise, metaStream, fromInterval } from "@thi.ng/rstream";
 import { $compile, $replace } from "@thi.ng/rdom";
 import { scan, comp, reducer, map } from "@thi.ng/transducers";
-import {Counter} from "./counter"
+// import { Counter } from "./counter"; // Blocks
+import type { Counter } from "./counter";
 
 const counterComponent = () => {
-	const counter = new Counter();
+  let counter: Counter;
   let containerEl: HTMLElement;
   return {
     el: containerEl,
@@ -13,12 +14,15 @@ const counterComponent = () => {
       idx: number | Element,
       ...xs: any[]
     ): Promise<Element> => {
+      // counter
+      const { Counter } = await import("./counter");
+      const counter = new Counter();
       // container
       containerEl = document.createElement("div");
       containerEl.classList = ["pointer"];
       // Message
       let messageEl = document.createElement("span");
-      messageEl.innerText = "Click Me: ";
+      messageEl.innerText = "Click Me:";
       containerEl.appendChild(messageEl);
       // counter element
       let counterEl = document.createElement("span");
@@ -44,4 +48,10 @@ const counterComponent = () => {
 };
 
 const root = document.getElementById("app")!;
-$compile(["div", {}, counterComponent(), counterComponent()]).mount(root);
+$compile([
+  "div.pa3.flex.flex-column.items-center",
+  {},
+  "Counter Demo",
+  counterComponent(),
+  counterComponent(),
+]).mount(root);
