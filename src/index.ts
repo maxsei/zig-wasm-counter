@@ -25,14 +25,21 @@ const CounterPromise = fetch("/zig-out/lib/zig-wasm-triangle.wasm")
       },
   );
 
-const clickComponent = () =>
-  fromPromise(
-    (async () => {
+const counterComponent = () => {
+  let counter: Counter;
+  let containerEl: HTMLElement;
+  return {
+    el: containerEl,
+    mount: async (
+      parent: ParentNode,
+      idx: number | Element,
+      ...xs: any[]
+    ): Promise<Element> => {
       // counter
       const Counter = await CounterPromise;
-      const counter = new Counter();
+      counter = new Counter();
       // container
-      let containerEl = document.createElement("div");
+      containerEl = document.createElement("div");
       containerEl.classList = ["pointer"];
       // Message
       let messageEl = document.createElement("span");
@@ -46,33 +53,20 @@ const clickComponent = () =>
         counter.increment();
         counterEl.innerText = `${counter.get_count()}`;
       };
-      // IComponent
-      return {
-        el: containerEl,
-        mount: async (
-          parent: ParentNode,
-          idx: number | Element,
-          ...xs: any[]
-        ): Promise<Element> => {
-          if (idx === -1 || parent.childElementCount === idx) {
-            parent.appendChild(containerEl);
-          } else {
-            parent.insertBefore(containerEl, parent.childNodes[idx]);
-          }
-          return parent;
-        },
-        unmount: async (): Promise<void> => {
-          containerEl.remove();
-          counter.deinit();
-        },
-      };
-    })(),
-  );
+      // Insert container element.
+      if (idx === -1 || parent.childElementCount === idx) {
+        parent.appendChild(containerEl);
+      } else {
+        parent.insertBefore(containerEl, parent.childNodes[idx]);
+      }
+      return parent;
+    },
+    unmount: async (): Promise<void> => {
+      containerEl.remove();
+      counter.deinit();
+    },
+  };
+};
 
 const root = document.getElementById("app")!;
-$compile([
-  "div",
-  {},
-  $replace(clickComponent()),
-  $replace(clickComponent()),
-]).mount(root);
+$compile(["div", {}, counterComponent(), counterComponent()]).mount(root);
