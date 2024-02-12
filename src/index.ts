@@ -1,4 +1,4 @@
-import { stream, fromPromise } from "@thi.ng/rstream";
+import { fromPromise, metaStream, fromInterval } from "@thi.ng/rstream";
 import { $compile, $replace } from "@thi.ng/rdom";
 import { scan, comp, reducer, map } from "@thi.ng/transducers";
 
@@ -28,29 +28,44 @@ const CounterPromise = fetch("/zig-out/lib/zig-wasm-triangle.wasm")
 const clickComponent = () =>
   fromPromise(
     (async () => {
+      // counter
       const Counter = await CounterPromise;
       const counter = new Counter();
-      // TODO: onunmount destroy <12-02-24, Max Schulte> //
-      const click = stream<void>();
-      return [
-        "div",
-        { onclick: () => click.next() },
-        ["div.pointer", {}, "clickme"],
-        click.transform(
-          comp(
-            scan(
-              reducer(
-                () => counter,
-                (acc, cur) => {
-                  acc.increment();
-                  return acc;
-                },
-              ),
-            ),
-            map((x) => x.get_count()),
-          ),
-        ),
-      ];
+      // container
+      let containerEl = document.createElement("div");
+      containerEl.classList = ["pointer"];
+      // Message
+      let messageEl = document.createElement("span");
+      messageEl.innerText = "Click Me: ";
+      containerEl.appendChild(messageEl);
+      // counter element
+      let counterEl = document.createElement("span");
+      counterEl.innerText = `${counter.get_count()}`;
+      containerEl.appendChild(counterEl);
+      containerEl.onclick = (e: MouseEvent) => {
+        counter.increment();
+        counterEl.innerText = `${counter.get_count()}`;
+      };
+      // IComponent
+      return {
+        el: containerEl,
+        mount: async (
+          parent: ParentNode,
+          idx: number | Element,
+          ...xs: any[]
+        ): Promise<Element> => {
+          if (idx === -1 || parent.childElementCount === idx) {
+            parent.appendChild(containerEl);
+          } else {
+            parent.insertBefore(containerEl, parent.childNodes[idx]);
+          }
+          return parent;
+        },
+        unmount: async (): Promise<void> => {
+          containerEl.remove();
+          counter.deinit();
+        },
+      };
     })(),
   );
 
