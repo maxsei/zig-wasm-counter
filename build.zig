@@ -21,7 +21,7 @@ pub fn build(b: *std.Build) void {
 
     const lib = b.addSharedLibrary(.{
         // const lib = b.addStaticLibrary(.{
-        .name = "zig-wasm-triangle",
+        .name = "zig-wasm-counter",
         // In this case the main source file is merely a path, however, in more
         // complicated build scripts, this could be a generated file.
         .root_source_file = .{ .path = "zig/main.zig" },

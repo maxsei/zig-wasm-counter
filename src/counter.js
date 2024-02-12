@@ -1,4 +1,4 @@
-const Counter = await fetch("/zig-out/lib/zig-wasm-triangle.wasm")
+const Counter = await fetch("/zig-out/lib/zig-wasm-counter.wasm")
   .then((response) => response.arrayBuffer())
   .then((bytes) => WebAssembly.compile(bytes))
   .then((module) => new WebAssembly.Instance(module))
